@@ -5,8 +5,8 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 -- ===== CONFIGURAÇÕES =====
-local MENU_WIDTH = 300
-local MENU_HEIGHT = 400
+local MENU_WIDTH = 320
+local MENU_HEIGHT = 500
 local RGB_SPEED = 2 -- Velocidade da animação RGB
 local DRAG_SENSITIVITY = 1.5
 
@@ -96,46 +96,150 @@ padding.PaddingTop = UDim.new(0, 15)
 padding.PaddingBottom = UDim.new(0, 15)
 padding.Parent = contentFrame
 
--- Lista de opções
+-- Lista principal
 local listLayout = Instance.new("UIListLayout")
-listLayout.Padding = UDim.new(0, 10)
+listLayout.Padding = UDim.new(0, 12)
 listLayout.Parent = contentFrame
 
--- Função para criar botões do menu
-local function createMenuButton(text, parent)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, 0, 0, 40)
-    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    btn.TextColor3 = Color3.fromRGB(200, 200, 200)
-    btn.TextSize = 14
-    btn.Font = Enum.Font.Gotham
-    btn.Text = text
-    btn.BorderSizePixel = 0
-    btn.Parent = parent
+-- ===== FUNÇÃO PARA CRIAR CATEGORIAS =====
+local function createCategory(categoryName, icon)
+    -- Container da categoria
+    local categoryContainer = Instance.new("Frame")
+    categoryContainer.Name = categoryName .. "Container"
+    categoryContainer.Size = UDim2.new(1, 0, 0, 110)
+    categoryContainer.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    categoryContainer.BorderSizePixel = 0
+    categoryContainer.Parent = contentFrame
     
-    local btnStroke = Instance.new("UIStroke")
-    btnStroke.Thickness = 1
-    btnStroke.Color = Color3.fromRGB(100, 100, 100)
-    btnStroke.Parent = btn
+    local categoryStroke = Instance.new("UIStroke")
+    categoryStroke.Thickness = 2
+    categoryStroke.Color = Color3.fromRGB(80, 80, 80)
+    categoryStroke.Parent = categoryContainer
     
-    -- Hover effect
-    btn.MouseEnter:Connect(function()
-        btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    end)
+    -- Padding do container
+    local containerPadding = Instance.new("UIPadding")
+    containerPadding.PaddingLeft = UDim.new(0, 12)
+    containerPadding.PaddingRight = UDim.new(0, 12)
+    containerPadding.PaddingTop = UDim.new(0, 10)
+    containerPadding.PaddingBottom = UDim.new(0, 10)
+    containerPadding.Parent = categoryContainer
     
-    btn.MouseLeave:Connect(function()
-        btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    end)
+    -- Cabeçalho da categoria (ícone + nome)
+    local headerFrame = Instance.new("Frame")
+    headerFrame.Name = "Header"
+    headerFrame.Size = UDim2.new(1, 0, 0, 35)
+    headerFrame.BackgroundTransparency = 1
+    headerFrame.Parent = categoryContainer
     
-    return btn
+    local headerLayout = Instance.new("UIListLayout")
+    headerLayout.FillDirection = Enum.FillDirection.Horizontal
+    headerLayout.Padding = UDim.new(0, 10)
+    headerLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    headerLayout.Parent = headerFrame
+    
+    -- Ícone (casinha)
+    local houseIcon = Instance.new("TextLabel")
+    houseIcon.Name = "HouseIcon"
+    houseIcon.Size = UDim2.new(0, 40, 0, 35)
+    houseIcon.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    houseIcon.TextColor3 = Color3.fromRGB(255, 150, 0)
+    houseIcon.TextSize = 24
+    houseIcon.Font = Enum.Font.GothamBold
+    houseIcon.Text = icon
+    houseIcon.BorderSizePixel = 0
+    houseIcon.Parent = headerFrame
+    
+    local houseStroke = Instance.new("UIStroke")
+    houseStroke.Thickness = 1
+    houseStroke.Color = Color3.fromRGB(100, 100, 100)
+    houseStroke.Parent = houseIcon
+    
+    -- Nome da categoria
+    local categoryLabel = Instance.new("TextLabel")
+    categoryLabel.Name = "CategoryLabel"
+    categoryLabel.Size = UDim2.new(1, -60, 0, 35)
+    categoryLabel.BackgroundTransparency = 1
+    categoryLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    categoryLabel.TextSize = 16
+    categoryLabel.Font = Enum.Font.GothamBold
+    categoryLabel.Text = categoryName
+    categoryLabel.TextXAlignment = Enum.TextXAlignment.Left
+    categoryLabel.Parent = headerFrame
+    
+    -- Frame para os switches/botões
+    local buttonsFrame = Instance.new("Frame")
+    buttonsFrame.Name = "Buttons"
+    buttonsFrame.Size = UDim2.new(1, 0, 0, 55)
+    buttonsFrame.BackgroundTransparency = 1
+    buttonsFrame.Parent = categoryContainer
+    
+    local buttonsLayout = Instance.new("UIListLayout")
+    buttonsLayout.FillDirection = Enum.FillDirection.Horizontal
+    buttonsLayout.Padding = UDim.new(0, 8)
+    buttonsLayout.Parent = buttonsFrame
+    
+    -- Função para criar switch/botão
+    local function createSwitch(switchName)
+        local switchBtn = Instance.new("TextButton")
+        switchBtn.Name = switchName .. "Switch"
+        switchBtn.Size = UDim2.new(0, 0, 0, 35)
+        switchBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        switchBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+        switchBtn.TextSize = 12
+        switchBtn.Font = Enum.Font.Gotham
+        switchBtn.Text = switchName
+        switchBtn.BorderSizePixel = 0
+        switchBtn.Parent = buttonsFrame
+        
+        local switchStroke = Instance.new("UIStroke")
+        switchStroke.Thickness = 1
+        switchStroke.Color = Color3.fromRGB(100, 100, 100)
+        switchStroke.Parent = switchBtn
+        
+        local switchPadding = Instance.new("UIPadding")
+        switchPadding.PaddingLeft = UDim.new(0, 12)
+        switchPadding.PaddingRight = UDim.new(0, 12)
+        switchPadding.Parent = switchBtn
+        
+        local isActive = false
+        
+        -- Hover effect
+        switchBtn.MouseEnter:Connect(function()
+            switchBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        end)
+        
+        switchBtn.MouseLeave:Connect(function()
+            if not isActive then
+                switchBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            end
+        end)
+        
+        -- Click effect
+        switchBtn.MouseButton1Click:Connect(function()
+            isActive = not isActive
+            if isActive then
+                switchBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+                switchBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            else
+                switchBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                switchBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+            end
+        end)
+        
+        return switchBtn
+    end
+    
+    -- Criar switches para a categoria
+    createSwitch("ON")
+    createSwitch("OFF")
+    
+    return categoryContainer
 end
 
--- Adicionar botões de exemplo
-createMenuButton("⚽ Chute Normal", contentFrame)
-createMenuButton("🔥 Super Chute", contentFrame)
-createMenuButton("🎯 Passe Preciso", contentFrame)
-createMenuButton("⚙️ Configurações", contentFrame)
-createMenuButton("❓ Ajuda", contentFrame)
+-- ===== CRIAR AS CATEGORIAS =====
+createCategory("Auto", "🏠")
+createCategory("ESP", "👁️")
+createCategory("GK", "🧤")
 
 -- ===== VARIÁVEIS DE ESTADO =====
 local isMinimized = false
@@ -266,4 +370,4 @@ RunService.RenderStepped:Connect(function()
     updateDrag()
 end)
 
-print("✅ Menu RGB carregado com sucesso!")
+print("✅ Menu RGB com categorias carregado com sucesso!")
